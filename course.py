@@ -10,7 +10,7 @@ import json
 
 # TODO: fill the blanks before using
 
-param = json.laod(open('config.json'))
+param = json.load(open('config.json'))
 username = param['username']
 password = getpass("password: ")
 
