@@ -6,14 +6,17 @@ import lxml.html
 from time import sleep
 import re
 from getpass import getpass
+import json
 
 # TODO: fill the blanks before using
-username = ""
+
+param = json.laod(open('config.json'))
+username = param['username']
 password = getpass("password: ")
 
-sem_num     = "" # example: "2015-2016-1"
-course_id   = "" # example: "40231162"
-sub_id      = "" # example: "0"
+sem_num     = param['sem_num'] # example: "2015-2016-1"
+course_id   = param['course_id'] # example: "40231162"
+sub_id      = param['sub_id'] # example: "0"
 
 captcha = 'http://zhjwxk.cic.tsinghua.edu.cn/login-jcaptcah.jpg?captchaflag=login1'
 loginPost = "https://zhjwxk.cic.tsinghua.edu.cn/j_acegi_formlogin_xsxk.do"
