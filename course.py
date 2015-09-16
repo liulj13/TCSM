@@ -17,6 +17,7 @@ password = getpass("password: ")
 sem_num     = param['sem_num'] # example: "2015-2016-1"
 course_id   = param['course_id'] # example: "40231162"
 sub_id      = param['sub_id'] # example: "0"
+freq        = param['freq']
 
 captcha = 'http://zhjwxk.cic.tsinghua.edu.cn/login-jcaptcah.jpg?captchaflag=login1'
 loginPost = "https://zhjwxk.cic.tsinghua.edu.cn/j_acegi_formlogin_xsxk.do"
@@ -102,7 +103,7 @@ while True:
             else:
                 attemptCnt += 1
                 print str(attemptCnt) + " attempt(s) failed."
-                sleep(1)
+                sleep(freq)
         except Exception as e:
             print e
             print "pass."
