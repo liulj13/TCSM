@@ -74,7 +74,7 @@ while True:
         formV['page'] = '-1'
         formV['m'] = 'rxSearch'
     except Exception as e:
-        print #!/usr/bin/env python
+        print e
         print 'pass.'
 
     while True:
