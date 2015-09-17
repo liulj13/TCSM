@@ -7,8 +7,7 @@ from time import sleep
 import re
 from getpass import getpass
 import json
-
-# TODO: fill the blanks before using
+import sys
 
 param = json.load(open('config.json'))
 username = param['username']
@@ -18,6 +17,14 @@ sem_num     = param['sem_num'] # example: "2015-2016-1"
 course_id   = param['course_id'] # example: "40231162"
 sub_id      = param['sub_id'] # example: "0"
 freq        = param['freq']
+course_type = param['course_type'] # example: rx, ty, bx, cx, xx
+
+csn = {}
+csn["rx"] = 'p_rx_id'
+csn["bx"] = 'p_bxk_id'
+csn["ty"] = 'p_rxTy_id'
+csn["xx"] = 'p_xxk_id'
+csn["cx"] = 'p_cxk_id';
 
 captcha = 'http://zhjwxk.cic.tsinghua.edu.cn/login-jcaptcah.jpg?captchaflag=login1'
 loginPost = "https://zhjwxk.cic.tsinghua.edu.cn/j_acegi_formlogin_xsxk.do"
@@ -67,24 +74,36 @@ while True:
             print 'pass.'
 
     try:
-        data = s.get("http://zhjwxk.cic.tsinghua.edu.cn/xkBks.vxkBksXkbBs.do?m=rxSearch&p_xnxq=%s" % sem_num).text
+        data = s.get("http://zhjwxk.cic.tsinghua.edu.cn/xkBks.vxkBksXkbBs.do?m=%sSearch&p_xnxq=%s" % (course_type, sem_num)).text
         html = lxml.html.fromstring(data)
         formV = extractForm(html.forms[0])
         formV['p_kch'] = course_id
         formV['page'] = '-1'
-        formV['m'] = 'rxSearch'
+        formV['m'] = "%sSearch" % course_type
+        
+        # trInfo = re.search(ur'<tr class="trr2">.*?</tr>', data, re.DOTALL + re.UNICODE).group(0)
+        # don't know how to make this work
+        # print lxml.etree.tostring(lxml.html.fromstring(trInfo), method="text")
     except Exception as e:
         print e
         print 'pass.'
 
+    displayed = 0
     while True:
         try:
             data = s.post('http://zhjwxk.cic.tsinghua.edu.cn/xkBks.vxkBksXkbBs.do', data=formV).text
-            if data.find('table_t') < 0:
+            tbl = re.search(r'(<table.*?trr1.*?</table>).*?(<table.*?trr2.*?</table>)', data, re.DOTALL)
+            if not tbl:
                 print "Session timeout!"
                 break
-            html = lxml.html.fromstring(data)
-            tbRes = html.get_element_by_id('table_t')
+
+            if displayed == 0:
+                displayed = 1
+                tbRes = lxml.html.fromstring(tbl.group(2))
+                for td in tbRes.cssselect('td'):
+                    print td.text_content().replace("\n", "").replace(" ", "")
+
+            tbRes = lxml.html.fromstring(tbl.group(2))
             ind = 0
             for td in tbRes.cssselect('td'):
                 ind += 1
@@ -95,8 +114,8 @@ while True:
             if left != "0":
                 html = lxml.html.fromstring(data)
                 formV = extractForm(html.forms[0])
-                formV['m'] = 'saveRxKc'
-                formV['p_rx_id'] = "%s;%s;%s;" % (sem_num, course_id, sub_id)
+                formV['m'] = "save%sKc" % course_type.title()
+                formV[csn[course_type]] = "%s;%s;%s;" % (sem_num, course_id, sub_id)
                 data = s.post('http://zhjwxk.cic.tsinghua.edu.cn/xkBks.vxkBksXkbBs.do', data=formV).text
                 print re.search(r'showMsg\((.*)\)', data).group(1)
                 exit(0)
@@ -107,3 +126,4 @@ while True:
         except Exception as e:
             print e
             print "pass."
+
