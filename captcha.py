@@ -3,12 +3,12 @@ from PIL import Image
 import sys
 import os
 
-"""
+'''
 api = tesseract.TessBaseAPI()
 api.Init(".","eng",tesseract.OEM_DEFAULT)
 api.SetVariable("tessedit_char_whitelist", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 api.SetPageSegMode(tesseract.PSM_AUTO)
-"""
+'''
 
 os.system("didjvu separate -o 1.out -m sauvola 1.jpg > /dev/null 2>&1")
 
@@ -90,11 +90,10 @@ img.save('1_.png', 'PNG')
 
 os.system("tesseract 1_.png stdout")
 
-"""
+'''
 mImgFile = "1_.png"
 mBuffer=open(mImgFile,"rb").read()
 result = tesseract.ProcessPagesBuffer(mBuffer,len(mBuffer),api)
 print result[0:4]
 api.End()
-"""
-
+'''
